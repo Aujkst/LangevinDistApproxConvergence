@@ -209,6 +209,11 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(os.path.join(file_path, 'langevin-samplegrads.pdf'))
 
+
+    fig = plt.figure(figsize=(8, 6))
+    ax1 = plt.subplot(2, 1, 1)
+    ax2 = plt.subplot(2, 1, 2)
+
     # Kolmogorov-Smirnov Distance
 
     cdf_dict = {
@@ -220,7 +225,6 @@ if __name__ == '__main__':
         'Beta': lambda x: stats.beta.cdf(x, a=alpha2, b=beta2),
     }
 
-    plt.figure(figsize=(8, 4))
     for col in samples:
         cdf_func = cdf_dict[col]
         distances = []
@@ -228,11 +232,10 @@ if __name__ == '__main__':
             values, cprobs = ecdf(samples.loc[:idx, col])
             distances.append(ks_distance(values, cprobs, cdf_func))
         distances = np.asarray(distances)
-        plt.plot(t, distances, label=f'{col} distribution')
+        ax1.plot(t, distances, label=f'{col} distribution')
 
-    plt.grid()
-    plt.legend()
-    plt.tight_layout()
+    ax1.grid()
+    ax1.legend()
 
     bound_dict = {
         'Normal': (-np.inf, np.inf),
@@ -243,7 +246,7 @@ if __name__ == '__main__':
         'Beta': (0.0, 1.0),
     }
 
-    plt.figure(figsize=(8, 4))
+
     for col in samples:
         cdf_func = cdf_dict[col]
         divergences = []
@@ -254,9 +257,9 @@ if __name__ == '__main__':
             cprobs = np.append(0.0, cprobs)
             divergences.append(kl_divergence(values, cprobs, cdf_func))
         divergences = np.asarray(divergences)
-        plt.plot(t, divergences, label=f'{col} distribution')
+        ax2.plot(t[:2000], divergences[:2000], label=f'{col} distribution')
 
-    plt.grid()
-    plt.legend()
+    ax2.grid()
+    ax2.legend()
     plt.tight_layout()
 
