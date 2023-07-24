@@ -232,7 +232,7 @@ if __name__ == '__main__':
             values, cprobs = ecdf(samples.loc[:idx, col])
             distances.append(ks_distance(values, cprobs, cdf_func))
         distances = np.asarray(distances)
-        ax1.plot(t, distances, label=f'{col} distribution')
+        ax1.plot(np.log10(t), np.log10(distances), label=f'{col} distribution')
 
     ax1.grid()
     ax1.legend()
@@ -257,9 +257,46 @@ if __name__ == '__main__':
             cprobs = np.append(0.0, cprobs)
             divergences.append(kl_divergence(values, cprobs, cdf_func))
         divergences = np.asarray(divergences)
-        ax2.plot(t[:2000], divergences[:2000], label=f'{col} distribution')
+        ax2.plot(np.log10(t), np.log10(divergences), label=f'{col} distribution')
 
     ax2.grid()
     ax2.legend()
     plt.tight_layout()
+    plt.show()
+
+
+# ---------------------------- #
+    fig = plt.figure(figsize=(8, 6))
+    ax1 = plt.subplot(2, 1, 1)
+    ax2 = plt.subplot(2, 1, 2)
+
+    for col in samples:
+        cdf_func = cdf_dict[col]
+        distances = []
+        for idx in tqdm(samples.index):
+            values, cprobs = ecdf(samples.loc[:idx, col])
+            distances.append(ks_distance(values, cprobs, cdf_func))
+        distances = np.asarray(distances)
+        ax1.plot(t, np.log2(distances), label=f'{col} distribution')
+
+    ax1.grid()
+    ax1.legend()
+
+
+    for col in samples:
+        cdf_func = cdf_dict[col]
+        divergences = []
+        for idx in tqdm(samples.index):
+            lower, _ = bound_dict[col]
+            values, cprobs = ecdf(samples.loc[:idx, col])
+            values = np.append(lower, values)
+            cprobs = np.append(0.0, cprobs)
+            divergences.append(kl_divergence(values, cprobs, cdf_func))
+        divergences = np.asarray(divergences)
+        ax2.plot(np.log2(t), divergences, label=f'{col} distribution')
+
+    ax2.grid()
+    ax2.legend()
+    plt.tight_layout()
+    plt.show()
 
