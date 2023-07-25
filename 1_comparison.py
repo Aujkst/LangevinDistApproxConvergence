@@ -105,132 +105,132 @@ if __name__ == '__main__':
     print(result)
 
 
-#     # Sample paths
+    # Sample paths
 
-#     fig = plt.figure(figsize=(8, 6))
-#     ax1 = plt.subplot(3, 2, 1)
-#     ax2 = plt.subplot(3, 2, 3)
-#     ax3 = plt.subplot(3, 2, 5)    
-#     ax4 = plt.subplot(3, 2, 2)
-#     ax5 = plt.subplot(3, 2, 4)
-#     ax6 = plt.subplot(3, 2, 6)
+    fig = plt.figure(figsize=(8, 6))
+    ax1 = plt.subplot(3, 2, 1)
+    ax2 = plt.subplot(3, 2, 3)
+    ax3 = plt.subplot(3, 2, 5)    
+    ax4 = plt.subplot(3, 2, 2)
+    ax5 = plt.subplot(3, 2, 4)
+    ax6 = plt.subplot(3, 2, 6)
 
-#     for col, ax in zip(samples, [ax1, ax2, ax3, ax4, ax5, ax6]):
-#         ax.plot(t[-1000:], samples[col][-1000:])
-#         ax.set_title(f'{col} distribution')
-#         ax.set_xlabel(r'$t$')
-#         ax.set_ylabel(r'$X_t$')
+    for col, ax in zip(samples, [ax1, ax2, ax3, ax4, ax5, ax6]):
+        ax.plot(t[-1000:], samples[col][-1000:])
+        ax.set_title(f'{col} distribution')
+        ax.set_xlabel(r'$t$')
+        ax.set_ylabel(r'$X_t$')
 
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(file_path, 'langevin-samples.pdf'))
+    plt.tight_layout()
+    plt.savefig(os.path.join(file_path, 'langevin-samples.pdf'))
 
-#     # Gradient paths
+    # Gradient paths
 
-#     fig = plt.figure(figsize=(8, 6))
-#     ax1 = plt.subplot(3, 2, 1)
-#     ax2 = plt.subplot(3, 2, 3)
-#     ax3 = plt.subplot(3, 2, 5)    
-#     ax4 = plt.subplot(3, 2, 2)
-#     ax5 = plt.subplot(3, 2, 4)
-#     ax6 = plt.subplot(3, 2, 6)
+    fig = plt.figure(figsize=(8, 6))
+    ax1 = plt.subplot(3, 2, 1)
+    ax2 = plt.subplot(3, 2, 3)
+    ax3 = plt.subplot(3, 2, 5)    
+    ax4 = plt.subplot(3, 2, 2)
+    ax5 = plt.subplot(3, 2, 4)
+    ax6 = plt.subplot(3, 2, 6)
 
-#     for col, ax in zip(grads, [ax1, ax2, ax3, ax4, ax5, ax6]):
-#         ax.plot(t[-1000:], grads[col][-1000:], 'g')
-#         ax.set_title(f'{col} distribution')
-#         ax.set_xlabel(r'$t$')
-#         ax.set_ylabel(r'$\nabla \log \pi (X_t)$')
+    for col, ax in zip(grads, [ax1, ax2, ax3, ax4, ax5, ax6]):
+        ax.plot(t[-1000:], grads[col][-1000:], 'g')
+        ax.set_title(f'{col} distribution')
+        ax.set_xlabel(r'$t$')
+        ax.set_ylabel(r'$\nabla \log \pi (X_t)$')
 
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(file_path, 'langevin-samplegrads.pdf'))
-
-
-#     fig = plt.figure(figsize=(8, 6))
-#     ax1 = plt.subplot(2, 1, 1)
-#     ax2 = plt.subplot(2, 1, 2)
-
-#     # Kolmogorov-Smirnov Distance
-
-#     cdf_dict = {
-#         'Normal': lambda x: params_dists['Normal'][0].cdf(torch.tensor(x)).numpy(),
-#         'Laplace': lambda x: params_dists['Laplace'][0].cdf(torch.tensor(x)).numpy(),
-#         'Student-t': lambda x: stats.t.cdf(x, df=df),
-#         'Gamma': lambda x: gamma_dist.cdf(torch.tensor(x)).numpy(),
-#         'Log-Normal': lambda x: lognorm_dist.cdf(torch.tensor(x)).numpy(),
-#         'Beta': lambda x: stats.beta.cdf(x, a=alpha2, b=beta2),
-#     }
-
-#     for col in samples:
-#         cdf_func = cdf_dict[col]
-#         distances = []
-#         for idx in tqdm(samples.index):
-#             values, cprobs = ecdf(samples.loc[:idx, col])
-#             distances.append(ks_distance(values, cprobs, cdf_func))
-#         distances = np.asarray(distances)
-#         ax1.plot(np.log10(t), np.log10(distances), label=f'{col} distribution')
-
-#     ax1.grid()
-#     ax1.legend()
-
-#     bound_dict = {
-#         'Normal': (-np.inf, np.inf),
-#         'Laplace': (-np.inf, np.inf),
-#         'Student-t': (-np.inf, np.inf),
-#         'Gamma': (0.0, np.inf),
-#         'Log-Normal': (0, np.inf),
-#         'Beta': (0.0, 1.0),
-#     }
+    plt.tight_layout()
+    plt.savefig(os.path.join(file_path, 'langevin-samplegrads.pdf'))
 
 
-#     for col in samples:
-#         cdf_func = cdf_dict[col]
-#         divergences = []
-#         for idx in tqdm(samples.index):
-#             lower, _ = bound_dict[col]
-#             values, cprobs = ecdf(samples.loc[:idx, col])
-#             values = np.append(lower, values)
-#             cprobs = np.append(0.0, cprobs)
-#             divergences.append(kl_divergence(values, cprobs, cdf_func))
-#         divergences = np.asarray(divergences)
-#         ax2.plot(np.log10(t), np.log10(divergences), label=f'{col} distribution')
+    fig = plt.figure(figsize=(8, 6))
+    ax1 = plt.subplot(2, 1, 1)
+    ax2 = plt.subplot(2, 1, 2)
 
-#     ax2.grid()
-#     ax2.legend()
-#     plt.tight_layout()
-#     plt.show()
+    # Kolmogorov-Smirnov Distance
+
+    cdf_dict = {
+        'Normal': lambda x: params_dists['Normal'][0].cdf(torch.tensor(x)).numpy(),
+        'Laplace': lambda x: params_dists['Laplace'][0].cdf(torch.tensor(x)).numpy(),
+        'Student-t': lambda x: stats.t.cdf(x, df=df),
+        'Gamma': lambda x: gamma_dist.cdf(torch.tensor(x)).numpy(),
+        'Log-Normal': lambda x: lognorm_dist.cdf(torch.tensor(x)).numpy(),
+        'Beta': lambda x: stats.beta.cdf(x, a=alpha2, b=beta2),
+    }
+
+    for col in samples:
+        cdf_func = cdf_dict[col]
+        distances = []
+        for idx in tqdm(samples.index):
+            values, cprobs = ecdf(samples.loc[:idx, col])
+            distances.append(ks_distance(values, cprobs, cdf_func))
+        distances = np.asarray(distances)
+        ax1.plot(np.log10(t), np.log10(distances), label=f'{col} distribution')
+
+    ax1.grid()
+    ax1.legend()
+
+    bound_dict = {
+        'Normal': (-np.inf, np.inf),
+        'Laplace': (-np.inf, np.inf),
+        'Student-t': (-np.inf, np.inf),
+        'Gamma': (0.0, np.inf),
+        'Log-Normal': (0, np.inf),
+        'Beta': (0.0, 1.0),
+    }
 
 
-# # ---------------------------- #
-#     fig = plt.figure(figsize=(8, 6))
-#     ax1 = plt.subplot(2, 1, 1)
-#     ax2 = plt.subplot(2, 1, 2)
+    for col in samples:
+        cdf_func = cdf_dict[col]
+        divergences = []
+        for idx in tqdm(samples.index):
+            lower, _ = bound_dict[col]
+            values, cprobs = ecdf(samples.loc[:idx, col])
+            values = np.append(lower, values)
+            cprobs = np.append(0.0, cprobs)
+            divergences.append(kl_divergence(values, cprobs, cdf_func))
+        divergences = np.asarray(divergences)
+        ax2.plot(np.log10(t), np.log10(divergences), label=f'{col} distribution')
 
-#     for col in samples:
-#         cdf_func = cdf_dict[col]
-#         distances = []
-#         for idx in tqdm(samples.index):
-#             values, cprobs = ecdf(samples.loc[:idx, col])
-#             distances.append(ks_distance(values, cprobs, cdf_func))
-#         distances = np.asarray(distances)
-#         ax1.plot(t, np.log2(distances), label=f'{col} distribution')
-
-#     ax1.grid()
-#     ax1.legend()
+    ax2.grid()
+    ax2.legend()
+    plt.tight_layout()
+    plt.show()
 
 
-#     for col in samples:
-#         cdf_func = cdf_dict[col]
-#         divergences = []
-#         for idx in tqdm(samples.index):
-#             lower, _ = bound_dict[col]
-#             values, cprobs = ecdf(samples.loc[:idx, col])
-#             values = np.append(lower, values)
-#             cprobs = np.append(0.0, cprobs)
-#             divergences.append(kl_divergence(values, cprobs, cdf_func))
-#         divergences = np.asarray(divergences)
-#         ax2.plot(np.log2(t), divergences, label=f'{col} distribution')
+# ---------------------------- #
+    fig = plt.figure(figsize=(8, 6))
+    ax1 = plt.subplot(2, 1, 1)
+    ax2 = plt.subplot(2, 1, 2)
 
-#     ax2.grid()
-#     ax2.legend()
-#     plt.tight_layout()
-#     plt.show()
+    for col in samples:
+        cdf_func = cdf_dict[col]
+        distances = []
+        for idx in tqdm(samples.index):
+            values, cprobs = ecdf(samples.loc[:idx, col])
+            distances.append(ks_distance(values, cprobs, cdf_func))
+        distances = np.asarray(distances)
+        ax1.plot(t, np.log2(distances), label=f'{col} distribution')
+
+    ax1.grid()
+    ax1.legend()
+
+
+    for col in samples:
+        cdf_func = cdf_dict[col]
+        divergences = []
+        for idx in tqdm(samples.index):
+            lower, _ = bound_dict[col]
+            values, cprobs = ecdf(samples.loc[:idx, col])
+            values = np.append(lower, values)
+            cprobs = np.append(0.0, cprobs)
+            divergences.append(kl_divergence(values, cprobs, cdf_func))
+        divergences = np.asarray(divergences)
+        ax2.plot(np.log2(t), divergences, label=f'{col} distribution')
+
+    ax2.grid()
+    ax2.legend()
+    plt.tight_layout()
+    plt.show()
 
