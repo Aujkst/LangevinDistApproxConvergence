@@ -141,4 +141,3 @@ class GeneralisedLogisticDist(Dist):
     # derivative of -((a + b) e^x)/(1 + e^x)^2
     def gggrad_log_pdf(self, x) -> float:
         return np.exp(x) * (np.exp(x) - 1) * (self.alpha + self.beta) / (np.exp(x) + 1)**3
-    
