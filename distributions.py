@@ -26,8 +26,6 @@ class Dist(object):
     def gggrad_log_pdf(self, x) -> float:
         pass
 
-    
-
 class NormalDist(Dist):
     def __init__(self, mu, sigma, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
