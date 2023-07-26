@@ -15,21 +15,21 @@ from utils import (
     strong_order_taylor_method
 )
 
-np.random.seed(1)
+np.random.seed(0)
 plt.rcParams['text.usetex'] = True
 
 if __name__ == '__main__':
 
     file_path = os.getcwd()
 
-    X_zero = 3.0
+    X_zero = 1.0
     step_size = 1e-1
-    max_itr = 1e5
+    max_itr = 1e6
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     # U = None
 
-    df = 10
+    df = 4
     t_dist = StudentTDist(df=df)
 
     samples, grads = {}, {}
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     for name, _samples in samples.items():
         distances, divergences = [], []
         for idx in tqdm(range(int(max_itr))):
-            if idx < 10:
+            if idx % 100 != 0:
                 continue
             values, cprobs = ecdf(_samples[:idx+1])
             distances.append(ks_distance(
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
     for name, result in results.items():
         for (distance_name, distances), ax in zip(result.items(), (ax1, ax2)):
-            ax.plot(np.log10(t)[10:], np.log10(distances), label=name)
+            ax.plot(np.log10(t)[::100][1:], np.log10(distances)[1:], label=name)
             ax.set_title(distance_name)
             ax.set_xlabel(r'$\log_{10}t$')
             ax.set_ylabel(r'$\log_{10}D_t$')

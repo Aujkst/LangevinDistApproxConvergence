@@ -3,12 +3,12 @@ from __future__ import annotations
 import numpy as np
 from typing import Callable
 
-def euler_maruyama_method(X, f_x, g_x, dt, U1, *args, **kwargs):
+def euler_maruyama_method(X, f_x, g_x, dt, U1=None, *args, **kwargs):
     U1 = U1 if U1 is not None else np.random.normal(loc=0.0, scale=1.0)
     dW = np.sqrt(dt) * U1
     return X + f_x * dt + g_x * dW
 
-def strong_order_taylor_method(X, f_x, df_x, ddf_x, g_x, dt, U1, U2, *args, **kwargs):
+def strong_order_taylor_method(X, f_x, df_x, ddf_x, g_x, dt, U1=None, U2=None, *args, **kwargs):
     
     U1 = U1 if U1 is not None else np.random.normal(loc=0.0, scale=1.0)
     U2 = U2 if U2 is not None else np.random.normal(loc=0.0, scale=1.0)

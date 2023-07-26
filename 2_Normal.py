@@ -23,8 +23,8 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     X_zero = 1.0
-    step_size = 1e-1
-    max_itr = 1e4
+    step_size = 0.1
+    max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     # U = None
@@ -78,6 +78,21 @@ if __name__ == '__main__':
         print(f'{name}: mean = {_samples[200:].mean(): .5f}, {_samples[200:].std(): .5f}')
     print(normal_dist.mean, normal_dist.std)
 
+    mean_results = {}
+    for name, _samples in samples.items():
+        means = []
+        for idx in tqdm(range(int(max_itr))):
+            if idx % 10 != 0:
+                continue
+            means.append(np.mean(_samples[:idx+1]))
+        mean_results[name] = np.asarray(means)
+    
+    plt.figure(figsize=(8, 6))
+    for name, means in mean_results.items():
+        plt.plot(t[::10][1:], np.log10(np.abs(means[1:] - normal_dist.mean)), label=name)
+    plt.tight_layout()
+    plt.show()
+
     # Sample path and gradients
 
     fig = plt.figure(figsize=(8, 8))
@@ -113,7 +128,7 @@ if __name__ == '__main__':
     for name, _samples in samples.items():
         distances, divergences = [], []
         for idx in tqdm(range(int(max_itr))):
-            if idx < 10:
+            if idx % 10 != 0:
                 continue
             values, cprobs = ecdf(_samples[:idx+1])
             distances.append(ks_distance(
@@ -137,7 +152,7 @@ if __name__ == '__main__':
 
     for name, result in results.items():
         for (distance_name, distances), ax in zip(result.items(), (ax1, ax2)):
-            ax.plot(np.log10(t)[10:], np.log10(distances), label=name)
+            ax.plot(np.log10(t)[::10][1:], np.log10(distances)[1:], label=name)
             ax.set_title(distance_name)
             ax.set_xlabel(r'$\log_{10}t$')
             ax.set_ylabel(r'$\log_{10}D_t$')
