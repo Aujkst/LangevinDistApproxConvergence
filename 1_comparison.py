@@ -17,7 +17,7 @@ from torch.distributions.log_normal import LogNormal
 from torch.distributions.transforms import ExpTransform, SigmoidTransform
 from torch.distributions.transformed_distribution import TransformedDistribution
 
-from langevin import LangevinAlgoSampler
+from langevin_torch import LangevinAlgoSampler
 from utils import ecdf, sigmoid_function, ks_distance, kl_divergence
 
 np.random.seed(0)
