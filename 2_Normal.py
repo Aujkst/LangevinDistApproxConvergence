@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
@@ -74,8 +75,8 @@ if __name__ == '__main__':
     )
     samples['StrongOrderTaylor-MALA'], grads['StrongOrderTaylor-MALA'] = sampler.run()
 
-    for name, _samples in samples.items():
-        print(f'{name}: mean = {_samples[200:].mean(): .5f}, {_samples[200:].std(): .5f}')
+
+    print(pd.DataFrame(samples).agg(['mean', 'std']).T)
     print(normal_dist.mean, normal_dist.std)
 
     mean_results = {}

@@ -29,7 +29,7 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     step_size = 1e-1
-    max_itr = 1e4
+    max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
 
     mu1, sigma1 = 1.0, 2.0 # Normal dist

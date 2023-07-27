@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy import stats
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     # U = None
 
-    alpha, beta = 2.0, 2.0
+    alpha, beta = 3.0, 5.0
     gl_dist = GeneralisedLogisticDist(alpha=alpha, beta=beta)
     beta_cdf = lambda x: stats.beta.cdf(x=x, a=alpha, b=beta)
 
@@ -79,8 +80,7 @@ if __name__ == '__main__':
     for name, _samples in samples.items():
         samples[name] = np.exp(_samples) / (1.0 + np.exp(_samples))
 
-    for name, _samples in samples.items():
-        print(f'{name}: mean = {_samples[200:].mean(): .5f}, {_samples[200:].std(): .5f}')
+    print(pd.DataFrame(samples).agg(['mean', 'std']).T)
     print(alpha / (alpha + beta))
     print(np.sqrt(alpha * beta / ((alpha + beta)**2 * (alpha + beta + 1))))
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     for name, _samples in samples.items():
         distances, divergences = [], []
         for idx in tqdm(range(int(max_itr))):
-            if idx % 100 != 0:
+            if idx % 10 != 0:
                 continue
             values, cprobs = ecdf(_samples[:idx+1])
             distances.append(ks_distance(
@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
     for name, result in results.items():
         for (distance_name, distances), ax in zip(result.items(), (ax1, ax2)):
-            ax.plot(np.log10(t)[::100][1:], np.log10(distances)[1:], label=name)
+            ax.plot(np.log10(t)[::10][1:], np.log10(distances)[1:], label=name)
             ax.set_title(distance_name)
             ax.set_xlabel(r'$\log_{10}t$')
             ax.set_ylabel(r'$\log_{10}D_t$')

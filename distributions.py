@@ -71,8 +71,8 @@ class StudentTDist(Dist):
     def log_pdf(self, x) -> float:
         to_sum = [
             np.log(gamma_fn((self.df + 1) / 2)),
-            np.log(np.sqrt(self.df * np.pi)),
-            np.log(gamma_fn(self.df / 2.0)),
+            - np.log(np.sqrt(self.df * np.pi)),
+            - np.log(gamma_fn(self.df / 2.0)),
             - 0.5 * (self.df + 1) * np.log(1 + x**2 / self.df)
         ]
         return np.sum(to_sum)

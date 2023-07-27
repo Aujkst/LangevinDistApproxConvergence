@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 def euler_maruyama_method(X, f_x, g_x, dt):
-    return X + f_x * dt + g_x * np.sqrt(dt) * torch.normal(mean=torch.tensor([0.0]), std=torch.tensor([1.0]))
+    return X + f_x * dt + g_x * np.sqrt(dt) * np.random.normal()
 
 class LangevinAlgoSampler(object):
     def __init__(

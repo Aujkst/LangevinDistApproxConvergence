@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     X_zero = 1.0
-    step_size = 1e-1
+    step_size = .1
     max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
@@ -74,8 +75,7 @@ if __name__ == '__main__':
     )
     samples['StrongOrderTaylor-MALA'], grads['StrongOrderTaylor-MALA'] = sampler.run()
 
-    for name, _samples in samples.items():
-        print(f'{name}: mean = {_samples[200:].mean(): .5f}, {_samples[200:].std(): .5f}')
+    print(pd.DataFrame(samples).agg(['mean', 'std']).T)
     print(t_dist.mean, t_dist.std)
 
     # Sample path and gradients
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     for name, _samples in samples.items():
         distances, divergences = [], []
         for idx in tqdm(range(int(max_itr))):
-            if idx % 100 != 0:
+            if idx % 10 != 0:
                 continue
             values, cprobs = ecdf(_samples[:idx+1])
             distances.append(ks_distance(
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
     for name, result in results.items():
         for (distance_name, distances), ax in zip(result.items(), (ax1, ax2)):
-            ax.plot(np.log10(t)[::100][1:], np.log10(distances)[1:], label=name)
+            ax.plot(np.log10(t)[::10][1:], np.log10(distances)[1:], label=name)
             ax.set_title(distance_name)
             ax.set_xlabel(r'$\log_{10}t$')
             ax.set_ylabel(r'$\log_{10}D_t$')
