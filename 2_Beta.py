@@ -101,12 +101,12 @@ if __name__ == '__main__':
 
     for (name, _samples), (_ax1, _ax2) in zip(samples.items(), axes):
         _ax1.plot(t[-2000:], _samples[-2000:])
-        _ax1.set_title(f'Student-t distribution ({name})')
+        _ax1.set_title(f'Beta distribution ({name})')
         _ax1.set_xlabel(r'$t$')
         _ax1.set_ylabel(r'$X_t$')
 
         _ax2.plot(t[-2000:], grads[name][-2000:], 'g')
-        _ax2.set_title(f'Student-t distribution ({name})')
+        _ax2.set_title(f'Beta distribution ({name})')
         _ax2.set_xlabel(r'$t$')
         _ax2.set_ylabel(r'$\nabla \log \pi (X_t)$')
 
