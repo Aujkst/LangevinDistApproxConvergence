@@ -63,7 +63,7 @@ class StudentTDist(Dist):
         self.df = df
 
         self.mean = 0.0
-        self.std = self.df / (self.df - 2)
+        self.std = np.sqrt(self.df / (self.df - 2))
 
     def cdf(self, x) -> float:
         return stats.t.cdf(x=x, df=self.df, loc=0.0, scale=1.0)

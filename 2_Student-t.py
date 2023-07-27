@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     X_zero = 1.0
     step_size = 1e-1
-    max_itr = 1e6
+    max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     # U = None
