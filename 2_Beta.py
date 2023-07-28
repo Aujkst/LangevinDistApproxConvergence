@@ -25,7 +25,7 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     X_zero = 1.0
-    step_size = 1e-1
+    step_size = 2.5
     max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))

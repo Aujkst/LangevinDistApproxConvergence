@@ -24,7 +24,7 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     X_zero = 1.0
-    step_size = .1
+    step_size = 2.5
     max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
@@ -94,12 +94,12 @@ if __name__ == '__main__':
     axes = ((ax1, ax2), (ax3, ax4), (ax5, ax6), (ax7, ax8))
 
     for (name, _samples), (_ax1, _ax2) in zip(samples.items(), axes):
-        _ax1.plot(t[-2000:], _samples[-2000:])
+        _ax1.plot(t[-100:], _samples[-100:])
         _ax1.set_title(f'Student-t distribution ({name})')
         _ax1.set_xlabel(r'$t$')
         _ax1.set_ylabel(r'$X_t$')
 
-        _ax2.plot(t[-2000:], grads[name][-2000:], 'g')
+        _ax2.plot(t[-100:], grads[name][-100:], 'g')
         _ax2.set_title(f'Student-t distribution ({name})')
         _ax2.set_xlabel(r'$t$')
         _ax2.set_ylabel(r'$\nabla \log \pi (X_t)$')
