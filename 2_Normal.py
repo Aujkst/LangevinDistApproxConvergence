@@ -79,20 +79,20 @@ if __name__ == '__main__':
     print(pd.DataFrame(samples).agg(['mean', 'std']).T)
     print(normal_dist.mean, normal_dist.std)
 
-    mean_results = {}
-    for name, _samples in samples.items():
-        means = []
-        for idx in tqdm(range(int(max_itr))):
-            if idx % 10 != 0:
-                continue
-            means.append(np.mean(_samples[:idx+1]))
-        mean_results[name] = np.asarray(means)
+    # mean_results = {}
+    # for name, _samples in samples.items():
+    #     means = []
+    #     for idx in tqdm(range(int(max_itr))):
+    #         if idx % 10 != 0:
+    #             continue
+    #         means.append(np.mean(_samples[:idx+1]))
+    #     mean_results[name] = np.asarray(means)
     
-    plt.figure(figsize=(8, 6))
-    for name, means in mean_results.items():
-        plt.plot(t[::10][1:], np.log10(np.abs(means[1:] - normal_dist.mean)), label=name)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(8, 6))
+    # for name, means in mean_results.items():
+    #     plt.plot(t[::10][1:], np.log10(np.abs(means[1:] - normal_dist.mean)), label=name)
+    # plt.tight_layout()
+    # plt.show()
 
     # Sample path and gradients
 
