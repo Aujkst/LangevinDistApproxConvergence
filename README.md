@@ -11,6 +11,7 @@ $$
 $$
 X_{t_n+1} = X_{t_n} + \frac{1}{2}\frac{\mathrm{d}}{\mathrm{d}x}\log\pi(X_{t_n})\Delta + \Delta W_n,
 $$
+
 where $\Delta W_n \sim \mathcal{N}(0, \Delta)$ i.i.d..
 
 ### Strong Order 1.5 Taylor Method
