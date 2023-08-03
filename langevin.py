@@ -6,13 +6,15 @@ from tqdm import tqdm
 from scipy import stats
 from distributions import Dist
 
+def _log_norm_density(x: float, mean: float, var: float) -> float:
+    return - 0.5 * (x - mean)**2 / var
+
 def euler_maruyama_method(X, f_x, g_x, dt, U1=None, *args, **kwargs):
     U1 = U1 if U1 is not None else np.random.normal(loc=0.0, scale=1.0)
     dW = np.sqrt(dt) * U1
     return X + f_x * dt + g_x * dW
 
 def strong_order_taylor_method(X, f_x, df_x, ddf_x, g_x, dt, U1=None, U2=None, *args, **kwargs):
-    
     U1 = U1 if U1 is not None else np.random.normal(loc=0.0, scale=1.0)
     U2 = U2 if U2 is not None else np.random.normal(loc=0.0, scale=1.0)
     dW = np.sqrt(dt) * U1
@@ -101,13 +103,13 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
     def proposal_log_density(self, X1, X2):
         if self.step_method == 'euler_maruyama_method':
             grad = self.target_dist.grad_log_pdf(X2)
-            density = stats.norm.pdf(
-                x=X1, 
-                loc=X2 + 0.5 * self.step_size * grad,
-                scale=np.sqrt(self.step_size)
-            )
-            return np.log(density)
+            mean = X2 + 0.5 * self.step_size * grad
+            var = self.step_size
+            return _log_norm_density(x=X1, mean=mean, var=var)
         if self.step_method == 'strong_order_taylor_method':
+            grad = self.target_dist.grad_log_pdf(X2)
+            ggrad = self.target_dist.ggrad_log_pdf(X2)
+            gggrad = self.target_dist.gggrad_log_pdf(X2)
             pass
 
     def accept(self):
