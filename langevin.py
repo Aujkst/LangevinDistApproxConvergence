@@ -6,12 +6,30 @@ from tqdm import tqdm
 from scipy import stats
 from distributions import Dist
 
+def euler_maruyama_method(X, f_x, g_x, dt, U1=None, *args, **kwargs):
+    U1 = U1 if U1 is not None else np.random.normal(loc=0.0, scale=1.0)
+    dW = np.sqrt(dt) * U1
+    return X + f_x * dt + g_x * dW
+
+def strong_order_taylor_method(X, f_x, df_x, ddf_x, g_x, dt, U1=None, U2=None, *args, **kwargs):
+    
+    U1 = U1 if U1 is not None else np.random.normal(loc=0.0, scale=1.0)
+    U2 = U2 if U2 is not None else np.random.normal(loc=0.0, scale=1.0)
+    dW = np.sqrt(dt) * U1
+    dZ = 0.5 * dt**1.5 * (U1 + U2 / np.sqrt(3))
+
+    to_sum = [X]
+    to_sum.append(f_x * dt + g_x * dW)
+    to_sum.append(df_x * g_x * dZ)
+    to_sum.append(0.5 * (f_x * df_x + 0.5 * g_x**2 * ddf_x) * dt**2)
+    return np.sum(to_sum)
+
 class LangevinAlgoSampler(object):
     def __init__(
             self,
             X_zero: float,
             target_dist: Dist,
-            method: Callable[..., float],
+            step_method: str,
             step_size: float = 0.1,
             max_itr: float = 1e4,
             U: np.ndarray = None,
@@ -19,7 +37,13 @@ class LangevinAlgoSampler(object):
         self.target_dist = target_dist
         self.step_size = step_size
         self.max_itr = max_itr
-        self.method = method
+        self.step_method = step_method
+        if step_method == 'euler_maruyama_method':
+            self.method = euler_maruyama_method
+        elif step_method == 'strong_order_taylor_method':
+            self.method = strong_order_taylor_method
+        else:
+            raise
         self.X = X_zero
         self._U = U
         
@@ -75,13 +99,16 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
         return self.X, grad
     
     def proposal_log_density(self, X1, X2):
-        grad = self.target_dist.grad_log_pdf(X2)
-        density = stats.norm.pdf(
-            x=X1, 
-            loc=X2 + 0.5 * self.step_size * grad,
-            scale=np.sqrt(self.step_size)
-        )
-        return np.log(density)
+        if self.step_method == 'euler_maruyama_method':
+            grad = self.target_dist.grad_log_pdf(X2)
+            density = stats.norm.pdf(
+                x=X1, 
+                loc=X2 + 0.5 * self.step_size * grad,
+                scale=np.sqrt(self.step_size)
+            )
+            return np.log(density)
+        if self.step_method == 'strong_order_taylor_method':
+            pass
 
     def accept(self):
         to_sum = [

@@ -11,9 +11,7 @@ from langevin import LangevinAlgoSampler, MetropolisAdjLangevinAlgoSampler
 from utils import (
     ecdf, 
     ks_distance, 
-    kl_divergence, 
-    euler_maruyama_method, 
-    strong_order_taylor_method
+    kl_divergence
 )
 
 np.random.seed(1)
