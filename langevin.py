@@ -77,12 +77,13 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             self, 
             X_zero: float, 
             target_dist: Dist, 
-            method: Callable[..., float], 
+            step_method: str, 
             step_size: float = 0.1,
             max_itr: float = 10000, 
             U: np.ndarray = None,
         ) -> None:
-        super().__init__(X_zero, target_dist, method, step_size, max_itr, U)
+        super().__init__(X_zero, target_dist, step_method, step_size, max_itr, U)
+        self.accept_res = []
         pass
 
     def run(self):
@@ -97,6 +98,7 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             df_x=0.5*ggrad, ddf_x=0.5*gggrad,
             g_x=1.0, dt=self.step_size, U1=U1, U2=U2)
         if self.accept():
+            self.accept_res.append(self.accept())
             self.X = self.X_prime
         return self.X, grad
     
@@ -110,7 +112,13 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             grad = self.target_dist.grad_log_pdf(X2)
             ggrad = self.target_dist.ggrad_log_pdf(X2)
             gggrad = self.target_dist.gggrad_log_pdf(X2)
-            pass
+            coef_u1 = np.sqrt(self.step_size) + 0.25 * ggrad * self.step_size**1.5
+            coef_u2 = 0.25 * ggrad * self.step_size**1.5 / np.sqrt(3)
+            var = coef_u1**2 + coef_u2**2
+            mean = np.sum([
+                X2, 0.5 * self.step_size * grad,
+                0.125 * self.step_size**2 * (grad * ggrad + gggrad)])
+            return _log_norm_density(x=X1, mean=mean, var=var)
 
     def accept(self):
         to_sum = [

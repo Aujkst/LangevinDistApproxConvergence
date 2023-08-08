@@ -14,7 +14,7 @@ from utils import (
     kl_divergence
 )
 
-np.random.seed(1)
+np.random.seed(0)
 plt.rcParams['text.usetex'] = True
 
 if __name__ == '__main__':
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     X_zero = 1.0
-    step_size = 10
+    step_size = 5
     max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
@@ -38,7 +38,7 @@ if __name__ == '__main__':
         target_dist=normal_dist,
         step_size=step_size,
         max_itr=max_itr,
-        method=euler_maruyama_method,
+        step_method='euler_maruyama_method',
         U=U,
     )
     samples['EulerMaruyama-Langevin'], grads['EulerMaruyama-Langevin'] = sampler.run()
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         target_dist=normal_dist,
         step_size=step_size,
         max_itr=max_itr,
-        method=strong_order_taylor_method,
+        step_method='strong_order_taylor_method',
         U=U,
     )
     samples['StrongOrderTaylor-Langevin'], grads['StrongOrderTaylor-Langevin'] = sampler.run()
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         target_dist=normal_dist,
         step_size=step_size,
         max_itr=max_itr,
-        method=euler_maruyama_method,
+        step_method='euler_maruyama_method',
         U=U,
     )
     samples['EulerMaruyama-MALA'], grads['EulerMaruyama-MALA'] = sampler.run()
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         target_dist=normal_dist,
         step_size=step_size,
         max_itr=max_itr,
-        method=strong_order_taylor_method,
+        step_method='strong_order_taylor_method',
         U=U,
     )
     samples['StrongOrderTaylor-MALA'], grads['StrongOrderTaylor-MALA'] = sampler.run()
