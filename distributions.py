@@ -25,6 +25,31 @@ class Dist(object):
 
     def gggrad_log_pdf(self, x) -> float:
         pass
+    
+class LaplaceDist(Dist):
+    def __init__(self, loc, scale, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.name = 'Laplace distribution'
+        self.loc = loc
+        self.scale = scale
+        
+        self.mean = loc
+        self.std = np.sqrt(2) * scale
+        
+    def cdf(self, x) -> float:
+        return stats.laplace.cdf(x, loc=self.loc, scale=self.scale)
+    
+    def log_pdf(self, x) -> float:
+        return - np.log(2 * self.scale) - np.abs(x - self.loc) / self.scale
+    
+    def grad_log_pdf(self, x) -> float:
+        return - 1 / self.scale if x > 0 else 1 / self.scale
+    
+    def ggrad_log_pdf(self, x) -> float:
+        return 0.0
+    
+    def gggrad_log_pdf(self, x) -> float:
+        return 0.0
 
 class NormalDist(Dist):
     def __init__(self, mu, sigma, *args, **kwargs) -> None:

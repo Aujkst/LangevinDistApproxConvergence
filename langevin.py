@@ -112,8 +112,11 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             grad = self.target_dist.grad_log_pdf(X2)
             ggrad = self.target_dist.ggrad_log_pdf(X2)
             gggrad = self.target_dist.gggrad_log_pdf(X2)
-            coef_u1 = np.sqrt(self.step_size) + 0.25 * ggrad * self.step_size**1.5
-            coef_u2 = 0.25 * ggrad * self.step_size**1.5 / np.sqrt(3)
+            a = 0.5 * grad
+            da = 0.5 * ggrad
+            dda = 0.5 * gggrad
+            coef_u1 = np.sqrt(self.step_size) + 0.5 * da * self.step_size**1.5
+            coef_u2 = 0.5 * da * self.step_size**1.5 / np.sqrt(3)
             var = coef_u1**2 + coef_u2**2
             mean = np.sum([
                 X2, 0.5 * self.step_size * grad,
