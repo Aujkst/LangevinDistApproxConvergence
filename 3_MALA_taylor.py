@@ -15,16 +15,16 @@ from utils import (
     kl_divergence
 )
 
-np.random.seed(1)
+np.random.seed(0)
 plt.rcParams['text.usetex'] = True
 
 if __name__ == '__main__':
 
-    file_path = os.getcwd()
+    save_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
     X_zero = 1.0
-    step_size = .5
-    max_itr = 1e5
+    step_size = 1
+    max_itr = 1e6
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     
@@ -49,13 +49,14 @@ if __name__ == '__main__':
 
     samples, grads = {}, {}
     
+    model_name = 'MALA_taylor'
     for name, _dist in all_dist.items():
-        sampler = LangevinAlgoSampler(
+        sampler = MetropolisAdjLangevinAlgoSampler(
             X_zero=X_zero,
             target_dist=_dist,
             step_size=step_size,
             max_itr=max_itr,
-            step_method='euler_maruyama_method',
+            step_method='strong_order_taylor_method',
             U=U,
         )
         if name == 'Beta distribution':
@@ -64,11 +65,48 @@ if __name__ == '__main__':
         else:
             samples[name], grads[name] = sampler.run()
 
+    # Sample path and gradients
+
+    fig = plt.figure(figsize=(8, 8))
+    ax1 = plt.subplot(4, 2, 1)
+    ax2 = plt.subplot(4, 2, 2)
+    ax3 = plt.subplot(4, 2, 3)
+    ax4 = plt.subplot(4, 2, 4)
+    ax5 = plt.subplot(4, 2, 5)
+    ax6 = plt.subplot(4, 2, 6)
+    ax5 = plt.subplot(4, 2, 5)
+    ax6 = plt.subplot(4, 2, 6)
+    ax7 = plt.subplot(4, 2, 7)
+    ax8 = plt.subplot(4, 2, 8)
+    axes = ((ax1, ax2), (ax3, ax4), (ax5, ax6), (ax7, ax8))
+
+    num_to_show = 500
+    for (name, _samples), (_ax1, _ax2) in zip(samples.items(), axes):
+        
+        _ax1.plot(t[-num_to_show:], _samples[-num_to_show:])
+        _ax1.set_title(f'{name}')
+        _ax1.set_xlabel(r'$t$')
+        _ax1.set_ylabel(r'$X_t$')
+        _ax1.grid()
+
+        _ax2.plot(t[-num_to_show:], grads[name][-num_to_show:], 'g')
+        _ax2.set_title(f'{name}')
+        _ax2.set_xlabel(r'$t$')
+        _ax2.set_ylabel(r'$\nabla \log \pi (X_t)$')
+        _ax2.grid()
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_path, f'{model_name}-samples.pdf'))
+    # plt.show()
 
     # KS Distance & KL Divergence
     
-    point_num = 100
-    idx_list = (max_itr * (np.arange(point_num) + 1) / point_num - 1).astype(int)
+    point_num = 500
+    # start_point = 1
+    # idx_list = (max_itr * (np.arange(point_num) + 1) / point_num - 1).astype(int)
+    # idx_list = (10 ** (np.log10(t).max() * (np.arange(point_num) + 1) / point_num)).astype(int)[start_point:]
+
+    idx_list = np.logspace(np.log10(t[100]), np.log10(t[-1]), num=point_num)
 
     results = {}
     for name, _samples in samples.items():
@@ -111,4 +149,5 @@ if __name__ == '__main__':
     ax1.legend()
     ax2.legend()
     plt.tight_layout()
+    plt.savefig(os.path.join(save_path, f'{model_name}-distances.pdf'))
     plt.show()

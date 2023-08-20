@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Callable
+from typing import Literal
 
 import numpy as np
 from tqdm import tqdm
@@ -31,7 +31,7 @@ class LangevinAlgoSampler(object):
             self,
             X_zero: float,
             target_dist: Dist,
-            step_method: str,
+            step_method: Literal['euler_maruyama_method', 'strong_order_taylor_method'],
             step_size: float = 0.1,
             max_itr: float = 1e4,
             U: np.ndarray = None,
@@ -77,7 +77,7 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             self, 
             X_zero: float, 
             target_dist: Dist, 
-            step_method: str, 
+            step_method: Literal['euler_maruyama_method', 'strong_order_taylor_method'],
             step_size: float = 0.1,
             max_itr: float = 10000, 
             U: np.ndarray = None,
