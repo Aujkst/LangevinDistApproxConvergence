@@ -112,8 +112,8 @@ if __name__ == '__main__':
     plt.show()
 
     # KS Distance & KL Divergence    
-    
-    idx_list = (max_itr * (np.arange(500) + 1) / 100 - 1).astype(int)
+    point_num = 1000
+    idx_list = (max_itr * (np.arange(point_num) + 1) / point_num - 1).astype(int)
 
     results = {}
     for name, _samples in samples.items():
