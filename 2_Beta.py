@@ -98,12 +98,12 @@ if __name__ == '__main__':
     axes = ((ax1, ax2), (ax3, ax4), (ax5, ax6), (ax7, ax8))
 
     for (name, _samples), (_ax1, _ax2) in zip(samples.items(), axes):
-        _ax1.plot(t[-2000:], _samples[-2000:])
+        _ax1.plot(t[-100:], _samples[-100:])
         _ax1.set_title(f'Beta distribution ({name})')
         _ax1.set_xlabel(r'$t$')
         _ax1.set_ylabel(r'$X_t$')
 
-        _ax2.plot(t[-2000:], grads[name][-2000:], 'g')
+        _ax2.plot(t[-100:], grads[name][-100:], 'g')
         _ax2.set_title(f'Beta distribution ({name})')
         _ax2.set_xlabel(r'$t$')
         _ax2.set_ylabel(r'$\nabla \log \pi (X_t)$')
@@ -111,15 +111,15 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.show()
 
-    # KS Distance & KL Divergence
+    # KS Distance & KL Divergence    
+    
+    idx_list = (max_itr * (np.arange(500) + 1) / 100 - 1).astype(int)
 
     results = {}
     for name, _samples in samples.items():
         distances, divergences = [], []
-        for idx in tqdm(range(int(max_itr))):
-            if idx % 10 != 0:
-                continue
-            values, cprobs = ecdf(_samples[:idx+1])
+        for idx in tqdm(idx_list):
+            values, cprobs = ecdf(_samples[:int(idx)])
             distances.append(ks_distance(
                 values=values, 
                 cprobs=cprobs, 
@@ -141,7 +141,8 @@ if __name__ == '__main__':
 
     for name, result in results.items():
         for (distance_name, distances), ax in zip(result.items(), (ax1, ax2)):
-            ax.plot(np.log10(t)[::10][1:], np.log10(distances)[1:], label=name)
+            ax.plot(np.log10(idx_list), np.log10(distances), label=name)
+            # ax.plot(idx_list, np.log10(distances), label=name)
             ax.set_title(distance_name)
             ax.set_xlabel(r'$\log_{10}t$')
             ax.set_ylabel(r'$\log_{10}D_t$')
