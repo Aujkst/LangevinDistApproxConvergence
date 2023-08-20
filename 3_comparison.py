@@ -23,7 +23,7 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     X_zero = 1.0
-    step_size = 1.
+    step_size = .5
     max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
@@ -73,17 +73,21 @@ if __name__ == '__main__':
     results = {}
     for name, _samples in samples.items():
         distances, divergences = [], []
+        if name == 'Beta distribution':
+            _cdf = beta_cdf
+        else:
+            _cdf = all_dist[name].cdf
         for idx in tqdm(idx_list):
             values, cprobs = ecdf(_samples[:int(idx)])
             distances.append(ks_distance(
                 values=values, 
                 cprobs=cprobs, 
-                cdf=beta_cdf,
+                cdf=_cdf,
             ))
             divergences.append(kl_divergence(
                 values=np.append(-np.inf, values), 
                 cprobs=np.append(0.0, cprobs), 
-                cdf=beta_cdf,
+                cdf=_cdf,
             ))
         results[name] = {
             'Kolmogorov-Smirnov distance': np.asarray(distances),
