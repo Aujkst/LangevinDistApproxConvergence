@@ -119,16 +119,20 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             coef_u2 = 0.5 * da * self.step_size**1.5 / np.sqrt(3)
             var = coef_u1**2 + coef_u2**2
             mean = np.sum([
-                X2, 0.5 * self.step_size * grad,
-                0.125 * self.step_size**2 * (grad * ggrad + gggrad)])
+                X2,
+                a * self.step_size,
+                0.5 * (a * da + 0.5 * dda) * self.step_size**2])
             return _log_norm_density(x=X1, mean=mean, var=var)
 
     def accept(self):
-        to_sum = [
-            self.target_dist.log_pdf(self.X_prime),
-            - self.target_dist.log_pdf(self.X),
-            self.proposal_log_density(self.X, self.X_prime),
-            - self.proposal_log_density(self.X_prime, self.X),
-        ]
-        alpha = min(1.0, np.exp(np.sum(to_sum)))
-        return np.random.rand() <= alpha
+        try:
+            to_sum = [
+                self.target_dist.log_pdf(self.X_prime),
+                - self.target_dist.log_pdf(self.X),
+                self.proposal_log_density(self.X, self.X_prime),
+                - self.proposal_log_density(self.X_prime, self.X),
+            ]
+            alpha = min(1.0, np.exp(np.sum(to_sum)))
+            return np.random.rand() <= alpha
+        except:
+            return False

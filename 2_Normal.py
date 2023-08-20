@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     X_zero = 1.0
     step_size = 5
-    max_itr = 1e5
+    max_itr = 1e4
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     # U = None
@@ -127,8 +127,8 @@ if __name__ == '__main__':
     for name, _samples in samples.items():
         distances, divergences = [], []
         for idx in tqdm(range(int(max_itr))):
-            if idx % 10 != 0:
-                continue
+            # if idx % 10 != 0:
+            #     continue
             values, cprobs = ecdf(_samples[:idx+1])
             distances.append(ks_distance(
                 values=values, 
@@ -151,7 +151,8 @@ if __name__ == '__main__':
 
     for name, result in results.items():
         for (distance_name, distances), ax in zip(result.items(), (ax1, ax2)):
-            ax.plot(np.log10(t)[::10][1:], np.log10(distances)[1:], label=name)
+            ax.plot(np.log10(t), np.log10(distances), label=name)
+            # ax.plot(np.log10(t)[::10][1:], np.log10(distances)[1:], label=name)
             ax.set_title(distance_name)
             ax.set_xlabel(r'$\log_{10}t$')
             ax.set_ylabel(r'$\log_{10}D_t$')

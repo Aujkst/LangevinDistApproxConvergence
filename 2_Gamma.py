@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from scipy import stats
 
-from distributions import StudentTDist
+from distributions import LogGammaDist
 from langevin import LangevinAlgoSampler, MetropolisAdjLangevinAlgoSampler
 from utils import (
     ecdf, 
@@ -22,20 +23,21 @@ if __name__ == '__main__':
     file_path = os.getcwd()
 
     X_zero = 1.0
-    step_size = 1.
+    step_size = 0.01
     max_itr = 1e5
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     # U = None
 
-    df = 4
-    t_dist = StudentTDist(df=df)
+    alpha, beta = 2.0, 6.0
+    loggamma_dist = LogGammaDist(alpha=alpha, beta=beta)
+    gamma_cdf = lambda x: stats.gamma.cdf(x=x, a=alpha, scale=1/beta)
 
     samples, grads = {}, {}
     
     sampler = LangevinAlgoSampler(
         X_zero=X_zero,
-        target_dist=t_dist,
+        target_dist=loggamma_dist,
         step_size=step_size,
         max_itr=max_itr,
         step_method='euler_maruyama_method',
@@ -45,7 +47,7 @@ if __name__ == '__main__':
 
     sampler = LangevinAlgoSampler(
         X_zero=X_zero,
-        target_dist=t_dist,
+        target_dist=loggamma_dist,
         step_size=step_size,
         max_itr=max_itr,
         step_method='strong_order_taylor_method',
@@ -55,7 +57,7 @@ if __name__ == '__main__':
 
     sampler = MetropolisAdjLangevinAlgoSampler(
         X_zero=X_zero,
-        target_dist=t_dist,
+        target_dist=loggamma_dist,
         step_size=step_size,
         max_itr=max_itr,
         step_method='euler_maruyama_method',
@@ -65,7 +67,7 @@ if __name__ == '__main__':
 
     sampler = MetropolisAdjLangevinAlgoSampler(
         X_zero=X_zero,
-        target_dist=t_dist,
+        target_dist=loggamma_dist,
         step_size=step_size,
         max_itr=max_itr,
         step_method='strong_order_taylor_method',
@@ -73,8 +75,12 @@ if __name__ == '__main__':
     )
     samples['StrongOrderTaylor-MALA'], grads['StrongOrderTaylor-MALA'] = sampler.run()
 
+    for name, _samples in samples.items():
+        samples[name] = np.exp(_samples)
+
     print(pd.DataFrame(samples).agg(['mean', 'std']).T)
-    print(t_dist.mean, t_dist.std)
+    print(f'mean = {alpha / beta:.4f}')
+    print(f'std = {np.sqrt(alpha / beta**2):.4f}')
 
     # Sample path and gradients
 
@@ -93,12 +99,12 @@ if __name__ == '__main__':
 
     for (name, _samples), (_ax1, _ax2) in zip(samples.items(), axes):
         _ax1.plot(t[-100:], _samples[-100:])
-        _ax1.set_title(f'Student-t distribution ({name})')
+        _ax1.set_title(f'Gamma distribution ({name})')
         _ax1.set_xlabel(r'$t$')
         _ax1.set_ylabel(r'$X_t$')
 
         _ax2.plot(t[-100:], grads[name][-100:], 'g')
-        _ax2.set_title(f'Student-t distribution ({name})')
+        _ax2.set_title(f'Gamma distribution ({name})')
         _ax2.set_xlabel(r'$t$')
         _ax2.set_ylabel(r'$\nabla \log \pi (X_t)$')
 
@@ -118,12 +124,12 @@ if __name__ == '__main__':
             distances.append(ks_distance(
                 values=values, 
                 cprobs=cprobs, 
-                cdf=t_dist.cdf,
+                cdf=gamma_cdf,
             ))
             divergences.append(kl_divergence(
                 values=np.append(-np.inf, values), 
                 cprobs=np.append(0.0, cprobs), 
-                cdf=t_dist.cdf,
+                cdf=gamma_cdf,
             ))
         results[name] = {
             'Kolmogorov-Smirnov distance': np.asarray(distances),

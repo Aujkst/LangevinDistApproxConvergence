@@ -26,6 +26,30 @@ class Dist(object):
     def gggrad_log_pdf(self, x) -> float:
         pass
     
+class LogGammaDist(Dist):
+    def __init__(self, alpha, beta, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.alpha = alpha
+        self.beta = beta
+    
+    def log_pdf(self, x) -> float:
+        to_sum = [
+            self.beta * x,
+            - np.exp(x) / self.alpha,
+            - self.beta * np.log(self.alpha),
+            - np.log(gamma_fn(self.beta))
+        ]
+        return np.sum(to_sum)
+    
+    def grad_log_pdf(self, x) -> float:
+        return self.beta - np.exp(x) / self.alpha
+    
+    def ggrad_log_pdf(self, x) -> float:
+        return - np.exp(x) / self.alpha
+    
+    def gggrad_log_pdf(self, x) -> float:
+        return - np.exp(x) / self.alpha
+        
 class LaplaceDist(Dist):
     def __init__(self, loc, scale, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
