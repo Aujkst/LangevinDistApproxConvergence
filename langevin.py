@@ -34,11 +34,13 @@ class LangevinAlgoSampler(object):
             step_method: Literal['euler_maruyama_method', 'strong_order_taylor_method'],
             step_size: float = 0.1,
             max_itr: float = 1e4,
+            burnin_steps: int = 200,
             U: np.ndarray = None,
         ) -> None:
         self.target_dist = target_dist
         self.step_size = step_size
         self.max_itr = max_itr
+        self.burnin_steps = burnin_steps
         self.step_method = step_method
         if step_method == 'euler_maruyama_method':
             self.method = euler_maruyama_method
@@ -70,7 +72,7 @@ class LangevinAlgoSampler(object):
                 sample, grad = self.step(U1=self._U[0, i], U2=self._U[1, i])
             samples.append(sample)
             grads.append(grad)
-        return np.asarray(samples), np.asarray(grads)
+        return np.asarray(samples[self.burnin_steps:]), np.asarray(grads[self.burnin_steps:])
     
 class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
     def __init__(
@@ -80,9 +82,10 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             step_method: Literal['euler_maruyama_method', 'strong_order_taylor_method'],
             step_size: float = 0.1,
             max_itr: float = 10000, 
+            burnin_steps: int = 200,
             U: np.ndarray = None,
         ) -> None:
-        super().__init__(X_zero, target_dist, step_method, step_size, max_itr, U)
+        super().__init__(X_zero, target_dist, step_method, step_size, max_itr, burnin_steps, U)
         self.accept_res = []
         pass
 

@@ -67,7 +67,7 @@ class LaplaceDist(Dist):
         return - np.log(2 * self.scale) - np.abs(x - self.loc) / self.scale
     
     def grad_log_pdf(self, x) -> float:
-        return - 1 / self.scale if x > 0 else 1 / self.scale
+        return - 1 / self.scale if ((x - self.loc) > 0) else 1 / self.scale
     
     def ggrad_log_pdf(self, x) -> float:
         return 0.0
