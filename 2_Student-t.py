@@ -18,12 +18,12 @@ np.random.seed(1)
 plt.rcParams['text.usetex'] = True
 
 if __name__ == '__main__':
-
-    file_path = os.getcwd()
+    
+    save_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
     X_zero = 1.0
     step_size = 1.
-    max_itr = 1e5
+    max_itr = 1e4
     t = np.arange(step_size, (max_itr + 1.0) * step_size, step_size)
     U = np.random.normal(loc=0.0, scale=1.0, size=(2, int(max_itr)))
     # U = None
@@ -39,6 +39,7 @@ if __name__ == '__main__':
         step_size=step_size,
         max_itr=max_itr,
         step_method='euler_maruyama_method',
+        burnin_steps=0,
         U=U,
     )
     samples['EulerMaruyama-Langevin'], grads['EulerMaruyama-Langevin'] = sampler.run()
@@ -49,6 +50,7 @@ if __name__ == '__main__':
         step_size=step_size,
         max_itr=max_itr,
         step_method='strong_order_taylor_method',
+        burnin_steps=0,
         U=U,
     )
     samples['StrongOrderTaylor-Langevin'], grads['StrongOrderTaylor-Langevin'] = sampler.run()
@@ -59,6 +61,7 @@ if __name__ == '__main__':
         step_size=step_size,
         max_itr=max_itr,
         step_method='euler_maruyama_method',
+        burnin_steps=0,
         U=U,
     )
     samples['EulerMaruyama-MALA'], grads['EulerMaruyama-MALA'] = sampler.run()
@@ -69,6 +72,7 @@ if __name__ == '__main__':
         step_size=step_size,
         max_itr=max_itr,
         step_method='strong_order_taylor_method',
+        burnin_steps=0,
         U=U,
     )
     samples['StrongOrderTaylor-MALA'], grads['StrongOrderTaylor-MALA'] = sampler.run()
@@ -91,13 +95,14 @@ if __name__ == '__main__':
     ax8 = plt.subplot(4, 2, 8)
     axes = ((ax1, ax2), (ax3, ax4), (ax5, ax6), (ax7, ax8))
 
+    num_to_show = 500
     for (name, _samples), (_ax1, _ax2) in zip(samples.items(), axes):
-        _ax1.plot(t[-100:], _samples[-100:])
+        _ax1.plot(t[-num_to_show:], _samples[-num_to_show:])
         _ax1.set_title(f'Student-t distribution ({name})')
         _ax1.set_xlabel(r'$t$')
         _ax1.set_ylabel(r'$X_t$')
 
-        _ax2.plot(t[-100:], grads[name][-100:], 'g')
+        _ax2.plot(t[-num_to_show:], grads[name][-num_to_show:], 'g')
         _ax2.set_title(f'Student-t distribution ({name})')
         _ax2.set_xlabel(r'$t$')
         _ax2.set_ylabel(r'$\nabla \log \pi (X_t)$')
@@ -107,8 +112,11 @@ if __name__ == '__main__':
 
     # KS Distance & KL Divergence
     
-    idx_list = (max_itr * (np.arange(500) + 1) / 100 - 1).astype(int)
+    # idx_list = (max_itr * (np.arange(500) + 1) / 100 - 1).astype(int)
     # idx_list = 10 ** (np.log10(max_itr) * (np.arange(50) + 1) / 100)
+    
+    point_num = 500
+    idx_list = np.logspace(np.log10(t[100]), np.log10(t[-1]), num=point_num)
 
     results = {}
     for name, _samples in samples.items():
@@ -147,4 +155,5 @@ if __name__ == '__main__':
     ax1.legend()
     ax2.legend()
     plt.tight_layout()
+    plt.savefig(os.path.join(save_path, f'distances-t.pdf'))
     plt.show()
