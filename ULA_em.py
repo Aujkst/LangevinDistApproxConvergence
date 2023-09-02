@@ -106,10 +106,6 @@ if __name__ == '__main__':
     # KS Distance & KL Divergence
     
     point_num = 500
-    # start_point = 1
-    # idx_list = (max_itr * (np.arange(point_num) + 1) / point_num - 1).astype(int)
-    # idx_list = (10 ** (np.log10(t).max() * (np.arange(point_num) + 1) / point_num)).astype(int)[start_point:]
-
     idx_list = np.logspace(np.log10(t[100]), np.log10(t[-1]), num=point_num)
 
     results = {}
