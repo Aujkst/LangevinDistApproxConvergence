@@ -59,12 +59,12 @@ if __name__ == '__main__':
             step_method='strong_order_taylor_method',
             U=U,
         )
-        print(f"{name}'s acceptance rate = {np.asarray(sampler.accept_res).mean()}")
         if name == 'Beta distribution':
             _samples, grads[name] = sampler.run()
             samples[name]  = np.exp(_samples) / (1.0 + np.exp(_samples))
         else:
             samples[name], grads[name] = sampler.run()
+        print(f"{name}'s acceptance rate = {np.asarray(sampler.accept_res).mean()}")
             
     pd.DataFrame(samples).agg(['mean', 'std']).T.to_csv(
         os.path.join(save_path, f'{model_name}-stats.csv')
