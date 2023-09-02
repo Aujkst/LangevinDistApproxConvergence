@@ -49,9 +49,9 @@ if __name__ == '__main__':
 
     samples, grads = {}, {}
     
-    model_name = 'MALA_taylor'
+    model_name = 'ULA_taylor'
     for name, _dist in all_dist.items():
-        sampler = MetropolisAdjLangevinAlgoSampler(
+        sampler = LangevinAlgoSampler(
             X_zero=X_zero,
             target_dist=_dist,
             step_size=step_size,
@@ -64,6 +64,10 @@ if __name__ == '__main__':
             samples[name]  = np.exp(_samples) / (1.0 + np.exp(_samples))
         else:
             samples[name], grads[name] = sampler.run()
+            
+    pd.DataFrame(samples).agg(['mean', 'std']).T.to_csv(
+        os.path.join(save_path, f'{model_name}-stats.csv')
+    )
 
     # Sample path and gradients
 
