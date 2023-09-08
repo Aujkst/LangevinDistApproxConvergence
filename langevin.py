@@ -79,7 +79,7 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             self, 
             X_zero: float, 
             target_dist: Dist, 
-            step_method: Literal['euler_maruyama_method', 'strong_order_taylor_method'],
+            step_method: str = 'euler_maruyama_method',
             step_size: float = 0.1,
             max_itr: float = 10000, 
             burnin_steps: int = 200,
@@ -111,21 +111,8 @@ class MetropolisAdjLangevinAlgoSampler(LangevinAlgoSampler):
             mean = X2 + 0.5 * self.step_size * grad
             var = self.step_size
             return _log_norm_density(x=X1, mean=mean, var=var)
-        if self.step_method == 'strong_order_taylor_method':
-            grad = self.target_dist.grad_log_pdf(X2)
-            ggrad = self.target_dist.ggrad_log_pdf(X2)
-            gggrad = self.target_dist.gggrad_log_pdf(X2)
-            a = 0.5 * grad
-            da = 0.5 * ggrad
-            dda = 0.5 * gggrad
-            coef_u1 = np.sqrt(self.step_size) + 0.5 * da * self.step_size**1.5
-            coef_u2 = 0.5 * da * self.step_size**1.5 / np.sqrt(3)
-            var = coef_u1**2 + coef_u2**2
-            mean = np.sum([
-                X2,
-                a * self.step_size,
-                0.5 * (a * da + 0.5 * dda) * self.step_size**2])
-            return _log_norm_density(x=X1, mean=mean, var=var)
+        else:
+            print('Other methods are not supported!')
 
     def accept(self):
         to_sum = [
