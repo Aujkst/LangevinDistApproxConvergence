@@ -25,31 +25,7 @@ class Dist(object):
 
     def gggrad_log_pdf(self, x) -> float:
         pass
-    
-class LogGammaDist(Dist):
-    def __init__(self, alpha, beta, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.alpha = alpha
-        self.beta = beta
-    
-    def log_pdf(self, x) -> float:
-        to_sum = [
-            self.beta * x,
-            - np.exp(x) / self.alpha,
-            - self.beta * np.log(self.alpha),
-            - np.log(gamma_fn(self.beta))
-        ]
-        return np.sum(to_sum)
-    
-    def grad_log_pdf(self, x) -> float:
-        return self.beta - np.exp(x) / self.alpha
-    
-    def ggrad_log_pdf(self, x) -> float:
-        return - np.exp(x) / self.alpha
-    
-    def gggrad_log_pdf(self, x) -> float:
-        return - np.exp(x) / self.alpha
-        
+
 class LaplaceDist(Dist):
     def __init__(self, loc, scale, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -104,7 +80,7 @@ class NormalDist(Dist):
     
     def gggrad_log_pdf(self, x) -> float:
         return 0.0
-    
+
 class StudentTDist(Dist):
     def __init__(self, df, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -134,36 +110,7 @@ class StudentTDist(Dist):
     
     def gggrad_log_pdf(self, x) -> float:
         return 2 * (1 + self.df) * x * (3 * self.df - x**2) / (self.df + x**2)**3
-    
-class GammaDist(Dist):
-    def __init__(self, alpha, beta, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.alpha = alpha
-        self.beta = beta
 
-        self.mean = self.alpha / self.beta
-        self.std = np.sqrt(self.alpha / self.beta**2)
-
-    def cdf(self, x) -> float:
-        return stats.gamma.cdf(x=x, a=self.alpha, loc=0.0, scale=1/self.beta)
-    
-    def log_pdf(self, x) -> float:
-        to_sum = [
-            np.log(self.beta**self.alpha / gamma_fn(self.alpha)),
-            (self.alpha - 1) * np.log(x),
-            - self.beta * x,
-        ]
-        return np.sum(to_sum)
-    
-    def grad_log_pdf(self, x) -> float:
-        return (self.alpha - 1) / x - self.beta
-    
-    def ggrad_log_pdf(self, x) -> float:
-        return - (self.alpha - 1) * x**(-2)
-    
-    def gggrad_log_pdf(self, x) -> float:
-        return 2 * (self.alpha - 1) * x**(-3)
-    
 class GeneralisedLogisticDist(Dist):
     def __init__(self, alpha, beta, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

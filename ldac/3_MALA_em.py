@@ -47,7 +47,7 @@ if __name__ == '__main__':
     beta_cdf = lambda x: stats.beta.cdf(x=x, a=alpha, b=beta)
     all_dist['Beta distribution'] = gl_dist
 
-    samples, grads = {}, {}
+    samples, grads, accept_results = {}, {}, {}
     
     model_name = 'MALA_em'
     for name, _dist in all_dist.items():
@@ -64,6 +64,11 @@ if __name__ == '__main__':
             samples[name]  = np.exp(_samples) / (1.0 + np.exp(_samples))
         else:
             samples[name], grads[name] = sampler.run()
+        print(f"{name}'s acceptance rate = {np.asarray(sampler.accept_res).mean()}")
+    
+    pd.DataFrame(samples).agg(['mean', 'std']).T.to_csv(
+        os.path.join(save_path, f'{model_name}-stats.csv')
+    )
 
     # Sample path and gradients
 
@@ -102,10 +107,6 @@ if __name__ == '__main__':
     # KS Distance & KL Divergence
     
     point_num = 500
-    # start_point = 1
-    # idx_list = (max_itr * (np.arange(point_num) + 1) / point_num - 1).astype(int)
-    # idx_list = (10 ** (np.log10(t).max() * (np.arange(point_num) + 1) / point_num)).astype(int)[start_point:]
-
     idx_list = np.logspace(np.log10(t[100]), np.log10(t[-1]), num=point_num)
 
     results = {}
