@@ -1,0 +1,77 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environment
+venv/
+env/
+*.env
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# C extensions
+*.so
+
+# PyInstaller
+*.spec
+
+# mypy
+.mypy_cache/
+
+# pytest
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+*.ipynb
+
+# dotenv
+.env
+
+# VSCode settings
+.vscode/
+
+# macOS Finder
+.DS_Store
+
+# Windows thumbnail cache
+Thumbs.db
+
+# IDEs and editors
+.idea/
+*.suo
+*.swp
+*.swo
+*.vscode/
+
+# Log files
+*.log
+
+# Other
+*.pkl
+*.pickle
+*.dat
+*.csv
+
+# Ignore all test directories
+test/
+tests/
+
+# Ignore all data directories
+data/
